@@ -14,6 +14,9 @@ db = mysql.connector.connect(
     database="hari"
 )
 
+# Initialize Flask-Mail
+mail = Mail(app)
+
 # Signup Route
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -26,7 +29,7 @@ def signup():
         cursor = db.cursor()
 
         # Check if username (email) already exists
-        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))  # Changed from 'email' to 'username'
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         existing_user = cursor.fetchone()
 
         if existing_user:
@@ -51,7 +54,6 @@ def signup():
 
 @app.route('/otp')
 def otp_page():
-    # Ensure you are retrieving and passing the correct key
     email = request.args.get('email')  # This should match the key used in the redirect
     if not email:
         flash("Email is missing. Please try again.", "danger")
@@ -63,7 +65,7 @@ def verify_otp():
     email = request.form.get('email')  # Safely retrieve the email field
     if not email:
         flash('Email is missing in the form submission. Please try again.', 'danger')
-        return redirect(url_for('otp_page'))  # Redirect or handle as needed
+        return redirect(url_for('otp_page'))
 
     otp_code = ''.join([
         request.form.get('otp1', ''), 
